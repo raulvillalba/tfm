@@ -17,7 +17,7 @@ class DQN(nn.Module):
         """
         version = "third"
         self.input_shape =  env.observation_space 
-        self.n_outputs = 6 
+        self.n_outputs = 4
         self.actions =  np.arange(self.n_outputs)
       
         if torch.cuda.is_available():

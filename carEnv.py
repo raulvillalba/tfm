@@ -210,57 +210,6 @@ class CarEnv:
             accel_steer.left_steer_angle_command = - np.pi / 2
             accel_steer.acceleration_command = 0
             accel_steer.brake_deceleration_command = 0
-        
-        # Turn Left
-        elif action == 4: 
-            
-            # To go straight
-            d = 3
-            incr_x = np.cos(theta) * d
-            incr_y = np.sin(theta) * d
-            p0 = Pose2D(x + incr_x / 2, y + incr_y / 2, 0)
-
-            # Turning angle 
-            incr_x = np.cos(theta + np.pi /4) * d
-            incr_y = np.sin(theta + np.pi /4) * d
-            p2 = Pose2D(x + incr_x, y + incr_y, 0)
-
-            # Go back from starting point
-            incr_x = np.cos(theta - np.pi / 2) * d
-            incr_y = np.sin(theta - np.pi / 2)* d
-            p1 = Pose2D(p2.x + incr_x / 2, p2.y + incr_y / 2, 0)
-
-            accel = 0
-
-            accel_steer.left_steer_angle_command = np.pi / 8
-            accel_steer.acceleration_command = 0
-            accel_steer.brake_deceleration_command = 0
-
-        # Turn Right
-        elif action == 5: 
-            
-            # To go straight
-            d = 3
-            incr_x = np.cos(theta) * d
-            incr_y = np.sin(theta) * d
-            p0 = Pose2D(x + incr_x / 2, y + incr_y / 2, 0)
-
-            # Turning angle 
-            incr_x = np.cos(theta - np.pi /4) * d
-            incr_y = np.sin(theta - np.pi /4) * d
-            p2 = Pose2D(x + incr_x, y + incr_y, 0)
-
-            # Go back from starting point
-            incr_x = np.cos(theta + np.pi / 2) * d
-            incr_y = np.sin(theta + np.pi / 2)* d
-            p1 = Pose2D(p2.x + incr_x / 2, p2.y + incr_y / 2, 0)
-
-            accel = 0
-
-            accel_steer.left_steer_angle_command = - np.pi / 8
-            accel_steer.acceleration_command = 0
-            accel_steer.brake_deceleration_command = 0
-
 
         action = [p0,p1,p2,accel]
 
