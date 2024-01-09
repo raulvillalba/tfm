@@ -4,7 +4,11 @@ from DQNagent import DQNAgent
 from carEnv import CarEnv
 import matplotlib.pyplot as plt
 import torch
-import time 
+
+import time
+
+
+
 
 def plot_rewards(agent,lr, gamma, batch_size, dnn_update_frequency, dnn_sync_frequency, memory_size, neurons):
         plt.figure(figsize=(12,8))
@@ -14,7 +18,7 @@ def plot_rewards(agent,lr, gamma, batch_size, dnn_update_frequency, dnn_sync_fre
         plt.xlabel('Episodes')
         plt.ylabel('Rewards')
         plt.legend(loc="upper left")
-        file_name = "figures/last_rewards_" + str(lr) + str(memory_size) +  "_" + str(neurons) + "_" + str(gamma) +  "_" + str(batch_size) + "_" + str(dnn_update_frequency) + "_" + str(dnn_sync_frequency) + ".png"
+        file_name = "figures/from_trained_seven_no_sleep_rewards_" + str(lr) + str(memory_size) +  "_" + str(neurons) + "_" + str(gamma) +  "_" + str(batch_size) + "_" + str(dnn_update_frequency) + "_" + str(dnn_sync_frequency) + ".png"
         plt.savefig(file_name)
         #plt.show()
  
@@ -24,10 +28,9 @@ def plot_loss(agent,lr, gamma, batch_size, dnn_update_frequency, dnn_sync_freque
         plt.xlabel('Steps')
         plt.ylabel('Loss')
         plt.legend(loc="upper left")
-        file_name = "figures/last_loss" + str(lr) + str(memory_size) +  "_" + str(neurons) + "_" + str(gamma) + "_" + str(batch_size) + "_" + str(dnn_update_frequency) + "_" + str(dnn_sync_frequency) + ".png"
+        file_name = "figures/from_trained_seven_no_sleep_loss" + str(lr) + str(memory_size) +  "_" + str(neurons) + "_" + str(gamma) + "_" + str(batch_size) + "_" + str(dnn_update_frequency) + "_" + str(dnn_sync_frequency) + ".png"
         plt.savefig(file_name)
         #plt.show()
-
 
 
 
@@ -41,10 +44,10 @@ BURN_IN = 100         #Number of episodes used to fill the buffer before trainin
 MAX_EPISODES = 500   #Max number of episodes
 MIN_EPISODES = 250    #Min number of episodes
 DNN_UPD = 4 #100         #Neural network update frequency
-DNN_SYNC = 500        #Neural networks synchronization frequency
+DNN_SYNC = 500        #Neural networks syncronization frequency
 NEURONS_list = [512]#, 256] #[16,32,64]          #Number of neurons on neural network's hidden layers
  
-reward_threshold = 10000
+reward_threshold = 1000
 
 
 for lr  in lr_list:
@@ -56,19 +59,30 @@ for lr  in lr_list:
                 env = CarEnv()
 
                 buffer = experienceReplayBuffer(memory_size=MEMORY_SIZE, burn_in=BURN_IN)
-                
+
                 dqn = DQN(env, learning_rate=lr, neurons=NEURONS)
-                
+
+                file_name = "trained_agents/last_agentDQN_Trained_Model_dqn_cnn0.000550000_512_0.99_32_4_500.pth"       
+                dqn.load_state_dict(torch.load(file_name))
+
                 agent = DQNAgent(env, dqn, buffer, reward_threshold, EPSILON, EPSILON_DECAY, BATCH_SIZE)
 
-                agent.train(gamma=GAMMA, max_episodes=MAX_EPISODES, batch_size=BATCH_SIZE, dnn_update_frequency=DNN_UPD, dnn_sync_frequency=DNN_SYNC)
+                games = 10
+                rewards = []
+                n_steps = []
+                t, total_reward, done = 0, 0, False
+                for i in range(0, games):
+                    agent.initialize()
+                    t, total_reward, done = 0, 0, False
 
-                file_name = "trained_agents/last_agentDQN_Trained_Model_dqn_cnn" + str(lr) + str(MEMORY_SIZE) +  "_" + str(NEURONS) + "_" + str(GAMMA) + "_" + str(BATCH_SIZE) + "_" + str(DNN_UPD) + "_" + str(DNN_SYNC) + ".pth"
-                torch.save(agent.main_network.state_dict(), file_name)
+                    while not done:
+                        done = agent.take_step(0)
 
-                toc = time.perf_counter()
+                        if done:
+                            print(agent.total_reward)
+                            rewards.append(agent.total_reward)
+                            n_steps.append(agent.step_count)
 
-                print(f"Execution time {toc - tic:0.4f} seconds")
-
-                plot_rewards(agent,lr = lr, gamma=GAMMA, batch_size=BATCH_SIZE, dnn_update_frequency=DNN_UPD, dnn_sync_frequency=DNN_SYNC, memory_size=MEMORY_SIZE, neurons=NEURONS)
-                plot_loss(agent,lr = lr, gamma=GAMMA, batch_size=BATCH_SIZE, dnn_update_frequency=DNN_UPD, dnn_sync_frequency=DNN_SYNC, memory_size=MEMORY_SIZE, neurons=NEURONS)
+            print(rewards)
+            print(n_steps)
+                    

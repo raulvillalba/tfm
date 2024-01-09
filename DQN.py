@@ -15,9 +15,9 @@ class DQN(nn.Module):
         device: cpu or cuda
         model: neural network definition
         """
-        version = "fourth"
+        version = "third"
         self.input_shape =  env.observation_space 
-        self.n_outputs = 4 
+        self.n_outputs = 6 
         self.actions =  np.arange(self.n_outputs)
       
         if torch.cuda.is_available():
@@ -45,11 +45,6 @@ class DQN(nn.Module):
                 torch.nn.ReLU(),
                 torch.nn.Linear(neurons, self.n_outputs, bias=True)).to(device=self.device)
         elif version == "third":
-            self.model = torch.nn.Sequential(
-                torch.nn.Linear(self.input_shape, neurons, bias=True),
-                torch.nn.ReLU(),
-                torch.nn.Linear(neurons, self.n_outputs, bias=True)).to(device=self.device)
-        elif version == "fourth":
             self.model = torch.nn.Sequential(
                 torch.nn.Linear(self.input_shape, neurons, bias=True),
                 torch.nn.ReLU(),
